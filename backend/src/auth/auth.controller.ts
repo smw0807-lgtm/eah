@@ -37,8 +37,18 @@ export class AuthController {
 
   // 회원가입
   @Post('signup')
-  async signup(@Body(new ValidationPipe()) input: InputSignup) {
-    return this.authService.signup(input);
+  async signup(
+    @Body(new ValidationPipe()) input: InputSignup,
+    @Res() res: Response,
+  ) {
+    try {
+      const user = await this.authService.signup(input);
+      this.logger.log(user, '회원가입 성공!');
+      return res.status(201).json({ message: 'Signup successful' });
+    } catch (error) {
+      this.logger.error(error, 'signup');
+      return res.status(400).json({ message: 'Signup failed' });
+    }
   }
 
   @Post('signin')

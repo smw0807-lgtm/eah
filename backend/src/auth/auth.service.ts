@@ -15,7 +15,6 @@ export class AuthService {
   ) {}
 
   async signup(input: InputSignup): Promise<User> {
-    this.logger.log(input, 'signup');
     const { nickname, email } = input;
     // 닉네임 중복 체크
     const isNicknameExists = await this.usersService.checkNickname(nickname);
@@ -28,7 +27,6 @@ export class AuthService {
       throw new BadRequestException('이메일이 이미 존재합니다.');
     }
     const user = await this.usersService.createUser(input);
-    this.logger.log('회원가입 성공');
     return user;
   }
 
