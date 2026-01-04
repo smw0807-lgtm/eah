@@ -8,11 +8,21 @@ import { UsersService } from 'src/users/users.service';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private accessExpiredDate: number;
+  private refreshExpiredDate: number;
+  private readonly DAY_IN_MS = 1000 * 60 * 60 * 24;
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-  ) {}
+  ) {
+    this.accessExpiredDate =
+      (this.configService.get('auth.accessExpiredDate') as number) *
+      this.DAY_IN_MS;
+    this.refreshExpiredDate =
+      (this.configService.get('auth.refreshExpiredDate') as number) *
+      this.DAY_IN_MS;
+  }
 
   async signup(input: InputSignup): Promise<User> {
     const { nickname, email } = input;
@@ -38,11 +48,11 @@ export class AuthService {
     };
     const access_token = this.jwtService.sign(payload, {
       secret: this.configService.get('auth.jwtSecret'),
-      expiresIn: this.configService.get('auth.accessExpiredDate'),
+      expiresIn: this.accessExpiredDate,
     });
     const refresh_token = this.jwtService.sign(payload, {
       secret: this.configService.get('auth.jwtSecret'),
-      expiresIn: this.configService.get('auth.refreshExpiredDate'),
+      expiresIn: this.refreshExpiredDate,
     });
     this.logger.log('토큰 생성 성공');
     return { access_token, refresh_token };

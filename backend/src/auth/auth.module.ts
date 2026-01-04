@@ -10,5 +10,6 @@ import { UtilsModule } from 'src/utils/utils.module';
   imports: [UsersModule, ConfigModule, JwtModule, UtilsModule],
   controllers: [AuthController],
   providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}
