@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UtilsModule } from './utils/utils.module';
 import { AuthModule } from './auth/auth.module';
 import { AccountsModule } from './accounts/accounts.module';
+import { CategorysModule } from './categorys/categorys.module';
 @Module({
   imports: [
     ConfigModule,
@@ -15,6 +16,7 @@ import { AccountsModule } from './accounts/accounts.module';
     UtilsModule,
     AuthModule,
     AccountsModule,
+    CategorysModule,
   ],
   controllers: [AppController],
   providers: [AppService],
