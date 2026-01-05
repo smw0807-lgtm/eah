@@ -18,7 +18,7 @@ export class AccountsController {
   }
 
   // 계좌 조회
-  @Get('get')
+  @Get()
   @UseGuards(AuthGuard)
   async getAccount(@CurrentUser() user: User) {
     return this.accountsService.getAccount(user.id);
