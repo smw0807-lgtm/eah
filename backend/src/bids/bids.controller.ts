@@ -41,19 +41,27 @@ export class BidsController {
     return this.bidsService.getUserBidsByNickname(nickname);
   }
 
+  // 사용자 입찰 내역 조회 - 이메일
+  @Get('user/email/:email')
+  @UseGuards(AuthGuard, RoleGuard)
+  @RBAC(Role.ADMIN)
+  async getUserBidsByEmail(@Param('email') email: string) {
+    return this.bidsService.getUserBidsByEmail(email);
+  }
+
   // 사용자 입찰 내역 조회
   @Get('user/:userId')
   @UseGuards(AuthGuard, RoleGuard)
   @RBAC(Role.ADMIN)
   async getUserBidsById(@Param('userId') userId: number) {
-    return this.bidsService.getUserBidsById(userId);
+    return this.bidsService.getUserBidsById(+userId);
   }
 
   // 경매 입찰 내역 조회
   @Get('auction/:auctionId')
   @UseGuards(AuthGuard)
   async getAuctionBids(@Param('auctionId') auctionId: number) {
-    return this.bidsService.getAuctionBids(auctionId);
+    return this.bidsService.getAuctionBids(+auctionId);
   }
 
   // 입찰 생성
@@ -82,9 +90,9 @@ export class BidsController {
     }
 
     return this.bidsService.createBid({
-      auctionId,
+      auctionId: +auctionId,
       bidderId: user.id,
-      amount,
+      amount: +amount,
     });
   }
 
@@ -110,14 +118,10 @@ export class BidsController {
   }
 
   // 입찰 삭제
-  @Delete('delete')
+  @Delete('delete/:id')
   @RBAC(Role.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
-  async deleteBid(@Body() body: { id: number }) {
-    const { id } = body;
-    if (!id) {
-      throw new BadRequestException('Invalid request body');
-    }
-    return this.bidsService.deleteBid(id);
+  async deleteBid(@Param('id') id: number) {
+    return this.bidsService.deleteBid(+id);
   }
 }

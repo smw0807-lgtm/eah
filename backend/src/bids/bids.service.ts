@@ -58,6 +58,22 @@ export class BidsService {
     return bids;
   }
 
+  // 사용자 입찰 내역 조회 - 이메일
+  async getUserBidsByEmail(email: string): Promise<Bid[]> {
+    const bids = await this.prisma.bid.findMany({
+      where: { bidder: { email: { equals: email, mode: 'insensitive' } } },
+      include: {
+        auction: true,
+        bidder: true,
+        winningFor: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return bids;
+  }
+
   // 사용자 입찰 내역 조회
   async getUserBidsById(userId: number): Promise<Bid[]> {
     const bids = await this.prisma.bid.findMany({
