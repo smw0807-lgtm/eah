@@ -8,6 +8,7 @@ import { UtilsModule } from './utils/utils.module';
 import { AuthModule } from './auth/auth.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { CategoryModule } from './category/category.module';
+import { BidsModule } from './bids/bids.module';
 @Module({
   imports: [
     ConfigModule,
@@ -17,6 +18,7 @@ import { CategoryModule } from './category/category.module';
     AuthModule,
     AccountsModule,
     CategoryModule,
+    BidsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
