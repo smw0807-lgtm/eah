@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Auction, AuctionStatus } from 'generated/prisma/client';
 import { AuctionCreateInput } from 'generated/prisma/models';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SearchAuctionsQuery } from './models/search.model';
 
 @Injectable()
 export class AuctionsService {
@@ -10,15 +11,8 @@ export class AuctionsService {
 
   // 경매 목록 조회
   async getAuctions(
-    orderBy:
-      | 'createdAt'
-      | 'updatedAt'
-      | 'title'
-      | 'price'
-      | 'status'
-      | 'startDate'
-      | 'endDate',
-    orderDirection: 'asc' | 'desc',
+    orderBy: SearchAuctionsQuery['orderBy'],
+    orderDirection: SearchAuctionsQuery['orderDirection'],
   ): Promise<Auction[]> {
     const auctions = await this.prisma.auction.findMany({
       orderBy: {
