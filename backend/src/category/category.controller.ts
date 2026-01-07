@@ -47,6 +47,9 @@ export class CategoryController {
     if (!code) {
       throw new BadRequestException('카테고리 코드를 입력해주세요.');
     }
+    if (await this.categoryService.isCategoryCodeExists(code)) {
+      throw new BadRequestException('이미 존재하는 카테고리 코드입니다.');
+    }
     return this.categoryService.createCategory(code, name);
   }
 

@@ -25,6 +25,14 @@ export class CategoryService {
     return categories;
   }
 
+  // 카테고리 코드 존재여부 확인
+  async isCategoryCodeExists(code: string): Promise<boolean> {
+    const category = await this.prisma.category.findUnique({
+      where: { code },
+    });
+    return !!category;
+  }
+
   // 카테고리 생성
   async createCategory(code: string, name: string): Promise<Category> {
     const newCategory = await this.prisma.category.create({
