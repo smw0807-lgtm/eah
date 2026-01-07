@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { CategoryModule } from './category/category.module';
 import { BidsModule } from './bids/bids.module';
+import { AuctionsModule } from './auctions/auctions.module';
 @Module({
   imports: [
     ConfigModule,
@@ -19,6 +20,7 @@ import { BidsModule } from './bids/bids.module';
     AccountsModule,
     CategoryModule,
     BidsModule,
+    AuctionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
