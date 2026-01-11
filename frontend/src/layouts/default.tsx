@@ -1,5 +1,5 @@
 import { Link, Outlet } from "react-router";
-import logo from "@/assets/eah-logo.png";
+// import logo from "@/assets/eah-logo.png";
 import logoText from "@/assets/EAH.png";
 
 export default function DefaultLayout() {
@@ -14,7 +14,7 @@ export default function DefaultLayout() {
               className="text-primary flex items-center gap-2 text-xl font-bold transition-opacity hover:opacity-80"
             >
               <div className="flex items-center gap-1.5">
-                <img src={logo} alt="logo" className="size-20" />
+                {/* <img src={logo} alt="logo" className="size-20" /> */}
                 <span>EAH</span>
               </div>
             </Link>
