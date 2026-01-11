@@ -11,6 +11,9 @@ export class CategoryService {
   async getTopCategories(): Promise<Category[]> {
     const topCategories = await this.prisma.category.findMany({
       where: { parentId: null },
+      orderBy: {
+        code: 'asc',
+      },
     });
     return topCategories;
   }

@@ -21,16 +21,12 @@ export class CategoryController {
 
   // 카테고리 조회
   @Get()
-  @RBAC(Role.ADMIN)
-  @UseGuards(AuthGuard, RoleGuard)
   async getCategories() {
     return this.categoryService.getCategories();
   }
 
   // 최상위 카테고리 조회
   @Get('get-top-categories')
-  @RBAC(Role.ADMIN)
-  @UseGuards(AuthGuard, RoleGuard)
   async getTopCategories() {
     return this.categoryService.getTopCategories();
   }
