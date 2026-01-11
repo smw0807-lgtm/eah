@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -6,14 +7,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Button } from "../ui/button";
 
 export default function SideMenu() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentCategory = searchParams.get("category");
+
   const categories = [
-    { name: "전체", href: "#" },
-    { name: "전자기기", href: "#" },
-    { name: "의류", href: "#" },
-    { name: "도서", href: "#" },
-    { name: "기타", href: "#" },
+    { name: "전체", query: "ALL" },
+    { name: "전자기기", query: "ELECTRONICS" },
+    { name: "의류", query: "CLOTHING" },
+    { name: "도서", query: "BOOKS" },
+    { name: "기타", query: "OTHER" },
   ];
   return (
     <div>
@@ -29,8 +34,16 @@ export default function SideMenu() {
               {categories.map((category) => (
                 <li key={category.name}>
                   <a
-                    href={category.href}
-                    className="text-foreground hover:bg-muted block rounded-md px-3 py-2 text-sm transition-colors"
+                    onClick={() =>
+                      setSearchParams({ category: category.query })
+                    }
+                    className={[
+                      "text-foreground hover:bg-muted block rounded-md px-3 py-2 text-sm transition-colors",
+                      currentCategory === category.query && "bg-muted",
+                      currentCategory === null &&
+                        category.query === "ALL" &&
+                        "bg-muted",
+                    ].join(" ")}
                   >
                     {category.name}
                   </a>
@@ -75,6 +88,17 @@ export default function SideMenu() {
                     <SelectItem value="마감 임박순">마감 임박순</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <label className="text-foreground mb-2 block text-sm font-medium">
+                  검색
+                </label>
+                <div className="flex gap-1">
+                  <Input type="text" placeholder="상품명 검색" />
+                  <Button type="submit" variant="outline">
+                    검색
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
