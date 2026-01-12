@@ -8,18 +8,21 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
+import { useTopCategory } from "@/hooks/queries/useTopCategory";
+import { Skeleton } from "../ui/skeleton";
+import { useEffect } from "react";
 
 export default function SideMenu() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentCategory = searchParams.get("category");
 
-  const categories = [
-    { name: "전체", query: "ALL" },
-    { name: "전자기기", query: "ELECTRONICS" },
-    { name: "의류", query: "CLOTHING" },
-    { name: "도서", query: "BOOKS" },
-    { name: "기타", query: "OTHER" },
-  ];
+  const { data: topCategories, isLoading: isTopCategoriesLoading } =
+    useTopCategory();
+
+  useEffect(() => {
+    // TODO: 카테고리 변경 시 카테고리 데이터 조회
+    console.log(searchParams.get("category"));
+  }, [searchParams]);
   return (
     <div>
       {/* 좌측 메뉴 */}
@@ -31,17 +34,21 @@ export default function SideMenu() {
               카테고리
             </h2>
             <ul className="space-y-2">
-              {categories.map((category) => (
+              {isTopCategoriesLoading &&
+                Array.from({ length: 10 }).map((_, index) => (
+                  <li key={index}>
+                    <Skeleton className="h-10 w-full rounded-md" />
+                  </li>
+                ))}
+              {topCategories?.map((category) => (
                 <li key={category.name}>
                   <a
-                    onClick={() =>
-                      setSearchParams({ category: category.query })
-                    }
+                    onClick={() => setSearchParams({ category: category.code })}
                     className={[
                       "text-foreground hover:bg-muted block rounded-md px-3 py-2 text-sm transition-colors",
-                      currentCategory === category.query && "bg-muted",
+                      currentCategory === category.code && "bg-muted",
                       currentCategory === null &&
-                        category.query === "ALL" &&
+                        category.code === "ALL" &&
                         "bg-muted",
                     ].join(" ")}
                   >
