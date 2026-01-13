@@ -1,6 +1,11 @@
 import logoText from "@/assets/EAH.png";
 import { Link } from "react-router";
+import SignInButton from "./SignInButton";
+import { useAuthIsAuthenticated } from "@/stores/auth";
+import MyPageButton from "./MyPageButton";
 export default function Header() {
+  const isAuthenticated = useAuthIsAuthenticated();
+
   return (
     <header className="border-border bg-background sticky top-0 z-50 border-b">
       <div className="container mx-auto px-4">
@@ -18,13 +23,7 @@ export default function Header() {
             <img src={logoText} alt="logo" className="size-30" />
           </h1>
 
-          {/* 마이페이지 */}
-          <Link
-            to="/mypage"
-            className="text-foreground hover:bg-muted-foreground rounded-md px-3 py-1 font-medium transition-colors"
-          >
-            마이페이지
-          </Link>
+          {isAuthenticated ? <MyPageButton /> : <SignInButton />}
         </div>
       </div>
     </header>
