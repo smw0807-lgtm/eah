@@ -25,6 +25,11 @@ export const useAuthStore = create(
       })),
       {
         name: "auth-storage",
+        partialize: (state) => ({
+          accessToken: state.accessToken,
+          refreshToken: state.refreshToken,
+          // actions는 persist에서 제외
+        }),
       },
     ),
   ),
