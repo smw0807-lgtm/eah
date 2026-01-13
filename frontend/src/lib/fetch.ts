@@ -34,7 +34,7 @@ export const post = async (
   return fetch(import.meta.env.VITE_API_URL + url, {
     method: "POST",
     headers: getHeaders(customHeaders),
-    body: JSON.stringify(data),
+    body: data ? JSON.stringify(data) : null,
   });
 };
 
@@ -46,7 +46,7 @@ export const put = async (
   return fetch(import.meta.env.VITE_API_URL + url, {
     method: "PUT",
     headers: getHeaders(customHeaders),
-    body: JSON.stringify(data),
+    body: data ? JSON.stringify(data) : null,
   });
 };
 

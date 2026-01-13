@@ -26,7 +26,8 @@ export function useSignIn() {
         });
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.log(error);
       toast.error("로그인 실패", {
         position: "top-center",
       });

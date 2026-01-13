@@ -7,20 +7,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { Form, FormControl, FormItem, FormLabel } from "../ui/form";
-import { useForm } from "react-hook-form";
-import type { SignInInput } from "@/models/auth";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useState } from "react";
+import { useSignIn } from "@/hooks/mutations/auth/useSignIn";
 
 export default function SignInModal() {
   const openSignInModal = useSigninModal();
-  const form = useForm<SignInInput>({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+
+  const { mutate: signIn } = useSignIn();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+  const handleSubmit = () => {
+    signIn({ email, password });
+  };
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       openSignInModal.actions.close();
@@ -33,27 +41,27 @@ export default function SignInModal() {
           <DialogTitle>로그인</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <Form {...form}>
-            <FormItem>
-              <FormLabel>이메일</FormLabel>
-              <FormControl>
-                <Input type="email" {...form.register("email")} />
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>비밀번호</FormLabel>
-              <FormControl>
-                <Input type="password" {...form.register("password")} />
-              </FormControl>
-            </FormItem>
-          </Form>
+          <div className="flex flex-col gap-2">
+            <Input
+              type="email"
+              placeholder="이메일"
+              value={email}
+              onChange={handleEmailChange}
+            />
+            <Input
+              type="password"
+              placeholder="비밀번호"
+              value={password}
+              onChange={handlePasswordChange}
+            />
+          </div>
         </DialogDescription>
         <DialogFooter>
           <div className="flex w-full flex-col gap-2">
-            <Button type="submit">로그인</Button>
-            <Button variant="outline" onClick={() => {}}>
-              회원가입
+            <Button type="submit" onClick={handleSubmit}>
+              로그인
             </Button>
+            <Button variant="outline">회원가입</Button>
           </div>
         </DialogFooter>
       </DialogContent>
