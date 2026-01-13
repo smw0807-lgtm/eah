@@ -3,8 +3,9 @@ import type { SignInInput } from "@/models/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuthActions } from "@/stores/auth";
+import type { UseMutationCallback } from "../types";
 
-export function useSignIn() {
+export function useSignIn(callback?: UseMutationCallback) {
   const { setTokens } = useAuthActions();
 
   return useMutation({
@@ -15,15 +16,11 @@ export function useSignIn() {
       const accessToken = data?.access_token;
       const refreshToken = data?.refresh_token;
 
+      if (callback?.onSuccess) {
+        callback.onSuccess();
+      }
       if (accessToken && refreshToken) {
         setTokens(accessToken, refreshToken);
-        toast.success("로그인 성공", {
-          position: "top-center",
-        });
-      } else {
-        toast.error("토큰을 받지 못했습니다", {
-          position: "top-center",
-        });
       }
     },
     onError: (error) => {

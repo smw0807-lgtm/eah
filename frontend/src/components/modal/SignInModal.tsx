@@ -11,6 +11,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { useSignIn } from "@/hooks/mutations/auth/useSignIn";
+import { toast } from "sonner";
 
 export default function SignInModal() {
   const openSignInModal = useSigninModal();
@@ -27,7 +28,23 @@ export default function SignInModal() {
     setPassword(e.target.value);
   };
   const handleSubmit = () => {
-    signIn({ email, password });
+    if (!email || !password) {
+      toast.error("이메일과 비밀번호를 입력해주세요", {
+        position: "top-center",
+      });
+      return;
+    }
+    signIn(
+      { email, password },
+      {
+        onSuccess: () => {
+          toast.success("로그인 성공", {
+            position: "top-center",
+          });
+          openSignInModal.actions.close();
+        },
+      },
+    );
   };
   const handleOpenChange = (open: boolean) => {
     if (!open) {
