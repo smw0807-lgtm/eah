@@ -7,9 +7,9 @@ export function useSignUp(callback?: UseMutationCallback) {
   return useMutation({
     mutationFn: ({ email, password, name, nickname }: SignUpInput) =>
       signUp({ email, password, name, nickname }),
-    onSuccess: () => {
+    onSuccess: (response) => {
       if (callback?.onSuccess) {
-        callback.onSuccess();
+        callback.onSuccess(response);
       }
     },
     onError: (error) => {

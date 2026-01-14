@@ -39,10 +39,13 @@ export default function SignUpModal() {
     signUp(
       { email, password, name, nickname },
       {
-        onSuccess: () => {
-          toast.success("회원가입 성공", {
+        onSuccess: (response) => {
+          toast.success(response?.message, {
             position: "top-center",
           });
+          if (response?.statusCode === 201) {
+            openSignupModal.actions.close();
+          }
         },
         onError: (error) => {
           console.log(error);
