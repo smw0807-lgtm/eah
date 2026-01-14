@@ -12,9 +12,11 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { useSignIn } from "@/hooks/mutations/auth/useSignIn";
 import { toast } from "sonner";
+import { useOpenSignupModal } from "@/stores/signup-modal";
 
 export default function SignInModal() {
   const openSignInModal = useSigninModal();
+  const openSignUpModal = useOpenSignupModal();
 
   const { mutate: signIn } = useSignIn();
 
@@ -78,7 +80,9 @@ export default function SignInModal() {
             <Button type="submit" onClick={handleSubmit}>
               로그인
             </Button>
-            <Button variant="outline">회원가입</Button>
+            <Button variant="outline" onClick={openSignUpModal}>
+              회원가입
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>
