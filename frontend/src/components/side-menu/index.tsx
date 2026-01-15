@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import { useTopCategory } from "@/hooks/queries/useTopCategory";
 import { Skeleton } from "../ui/skeleton";
 import { useEffect } from "react";
+import AddAuctionButton from "./AddAuctionButton";
 
 export default function SideMenu() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,6 +29,7 @@ export default function SideMenu() {
       {/* 좌측 메뉴 */}
       <aside className="border-border w-64 shrink-0 border-r pr-6">
         <nav className="space-y-6">
+          <AddAuctionButton />
           {/* 카테고리 섹션 */}
           <div>
             <h2 className="text-foreground mb-3 text-lg font-semibold">
