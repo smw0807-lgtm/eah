@@ -13,6 +13,7 @@ import { useSignIn } from "@/hooks/mutations/auth/useSignIn";
 import { toast } from "sonner";
 import { useOpenSignupModal } from "@/stores/signup-modal";
 import { emailRegex } from "@/lib/regRex";
+import { Label } from "../ui/label";
 
 export default function SignInModal() {
   const openSignInModal = useSigninModal();
@@ -66,15 +67,17 @@ export default function SignInModal() {
           <DialogTitle>로그인</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-2">
+          <Label>이메일</Label>
           <Input
             type="email"
-            placeholder="이메일"
+            placeholder="example@example.com"
             value={email}
             onChange={handleEmailChange}
           />
+          <Label>비밀번호</Label>
           <Input
             type="password"
-            placeholder="비밀번호"
+            placeholder="비밀번호를 입력해주세요"
             value={password}
             onChange={handlePasswordChange}
           />
