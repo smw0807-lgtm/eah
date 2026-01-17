@@ -1,17 +1,9 @@
 import { useSearchParams } from "react-router";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Button } from "../ui/button";
 import { useTopCategory } from "@/hooks/queries/useTopCategory";
-import { Skeleton } from "../ui/skeleton";
 import { useEffect } from "react";
 import AddAuctionButton from "./AddAuctionButton";
+import CategorySection from "./CategorySection";
+import FilterSection from "./FilterSection";
 
 export default function SideMenu() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,98 +16,34 @@ export default function SideMenu() {
     // TODO: 카테고리 변경 시 카테고리 데이터 조회
     console.log(searchParams.get("category"));
   }, [searchParams]);
+
+  const setFilterParams = (params: {
+    sort: string;
+    minPrice: number;
+    maxPrice: number;
+    search: string;
+  }) => {
+    console.log(params);
+    // TODO: 필터 파라미터를 이용한 검색
+  };
+
   return (
     <div>
       {/* 좌측 메뉴 */}
       <aside className="border-border w-64 shrink-0 border-r pr-6">
         <nav className="space-y-6">
           <AddAuctionButton />
+
           {/* 카테고리 섹션 */}
-          <div>
-            <h2 className="text-foreground mb-3 text-lg font-semibold">
-              카테고리
-            </h2>
-            <ul className="space-y-2">
-              {isTopCategoriesLoading &&
-                Array.from({ length: 10 }).map((_, index) => (
-                  <li key={index}>
-                    <Skeleton className="h-10 w-full rounded-md" />
-                  </li>
-                ))}
-              {topCategories?.map((category) => (
-                <li key={category.name}>
-                  <a
-                    onClick={() => setSearchParams({ category: category.code })}
-                    className={[
-                      "text-foreground hover:bg-muted block rounded-md px-3 py-2 text-sm transition-colors",
-                      currentCategory === category.code && "bg-muted",
-                      currentCategory === null &&
-                        category.code === "ALL" &&
-                        "bg-muted",
-                    ].join(" ")}
-                  >
-                    {category.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <CategorySection
+            isTopCategoriesLoading={isTopCategoriesLoading}
+            topCategories={topCategories ?? []}
+            currentCategory={currentCategory}
+            setSearchParams={setSearchParams}
+          />
 
           {/* 필터 섹션 */}
-          <div>
-            <h2 className="text-foreground mb-3 text-lg font-semibold">필터</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-foreground mb-2 block text-sm font-medium">
-                  가격 범위
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    placeholder="최소"
-                    className="border-input bg-background w-full rounded-md border px-3 py-1.5 text-sm"
-                  />
-                  <Input
-                    type="number"
-                    placeholder="최대"
-                    className="border-input bg-background w-full rounded-md border px-3 py-1.5 text-sm"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-foreground mb-2 block text-sm font-medium">
-                  정렬
-                </label>
-                <Select>
-                  <SelectTrigger className="border-input bg-background w-full rounded-md border px-3 py-1.5 text-sm">
-                    <SelectValue placeholder="정렬" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="최신순">최신순</SelectItem>
-                    <SelectItem value="가격 낮은순">가격 낮은순</SelectItem>
-                    <SelectItem value="가격 높은순">가격 높은순</SelectItem>
-                    <SelectItem value="마감 임박순">마감 임박순</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-foreground mb-2 block text-sm font-medium">
-                  검색
-                </label>
-                <Input type="text" placeholder="상품명 검색" />
-              </div>
-              <div>
-                <Button
-                  type="submit"
-                  variant="default"
-                  size="full"
-                  className="hover:bg-muted-foreground p-2"
-                >
-                  검색
-                </Button>
-              </div>
-            </div>
-          </div>
+          <FilterSection setFilterParams={setFilterParams} />
         </nav>
       </aside>
     </div>
