@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useSignIn } from "@/hooks/mutations/auth/useSignIn";
 import { toast } from "sonner";
 import { useOpenSignupModal } from "@/stores/signup-modal";
+import { emailRegex } from "@/lib/regRex";
 
 export default function SignInModal() {
   const openSignInModal = useSigninModal();
@@ -31,6 +32,12 @@ export default function SignInModal() {
   const handleSubmit = () => {
     if (!email || !password) {
       toast.error("이메일과 비밀번호를 입력해주세요", {
+        position: "top-center",
+      });
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      toast.error("이메일 형식이 올바르지 않습니다", {
         position: "top-center",
       });
       return;
