@@ -40,29 +40,29 @@ export class AuctionsController {
     @CurrentUser() user: User,
   ) {
     if (!auction.categoryId || !auction.subCategoryId) {
-      throw new BadRequestException(
-        'categoryId and subCategoryId are required',
-      );
+      throw new BadRequestException('카테고리와 서브카테고리를 선택해주세요.');
     }
     if (
       typeof auction.categoryId !== 'number' ||
       typeof auction.subCategoryId !== 'number'
     ) {
       throw new BadRequestException(
-        'categoryId and subCategoryId must be numbers',
+        '카테고리와 서브카테고리는 숫자여야 합니다.',
       );
     }
     if (auction.categoryId <= 0 || auction.subCategoryId <= 0) {
       throw new BadRequestException(
-        'categoryId and subCategoryId must be positive',
+        '카테고리와 서브카테고리는 양수여야 합니다.',
       );
     }
     if (auction.startAt >= auction.endAt) {
-      throw new BadRequestException('startAt must be before endAt');
+      throw new BadRequestException(
+        '시작일시는 종료일시보다 이전일 수 없습니다.',
+      );
     }
 
     if (auction.imageUrl && !auction.imageUrl.startsWith('https://')) {
-      throw new BadRequestException('imageUrl must be a valid URL');
+      throw new BadRequestException('이미지 URL은 유효한 URL이어야 합니다.');
     }
     return this.auctionsService.createAuction(auction, user.id);
   }
