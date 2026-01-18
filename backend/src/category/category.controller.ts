@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   BadRequestException,
+  Param,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { RBAC } from 'src/auth/decorator/rbac';
@@ -77,15 +78,13 @@ export class CategoryController {
   }
 
   // 카테고리 하위 카테고리 조회
-  @RBAC(Role.ADMIN)
-  @UseGuards(AuthGuard, RoleGuard)
-  @Get('get-sub-categories')
-  async getSubCategories(@Body() body: { parentId: number }) {
-    const { parentId } = body;
+  @UseGuards(AuthGuard)
+  @Get('get-sub-categories/:parentId')
+  async getSubCategories(@Param('parentId') parentId: number) {
     if (!parentId) {
       throw new BadRequestException('부모 카테고리 ID를 입력해주세요.');
     }
-    return this.categoryService.getSubCategories(parentId);
+    return this.categoryService.getSubCategories(+parentId);
   }
 
   // 카테고리 하위 카테고리 생성
