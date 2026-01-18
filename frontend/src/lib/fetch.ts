@@ -28,7 +28,10 @@ export const get = async (
 
 export const post = async (
   url: string,
-  data: null | Record<string, string | number | boolean | null | undefined>,
+  data: null | Record<
+    string,
+    string | number | boolean | null | undefined | Date
+  >,
   customHeaders?: Record<string, string>,
 ) => {
   return fetch(import.meta.env.VITE_API_URL + url, {
@@ -40,7 +43,10 @@ export const post = async (
 
 export const put = async (
   url: string,
-  data: null | Record<string, string | number | boolean | null | undefined>,
+  data: null | Record<
+    string,
+    string | number | boolean | null | undefined | Date
+  >,
   customHeaders?: Record<string, string>,
 ) => {
   return fetch(import.meta.env.VITE_API_URL + url, {
