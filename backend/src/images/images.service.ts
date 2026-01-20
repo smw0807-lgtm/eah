@@ -23,6 +23,8 @@ export class ImagesService {
     const {
       data: { publicUrl },
     } = supabase.storage.from(this.BUCKET_NAME).getPublicUrl(data.path);
-    return publicUrl;
+    return {
+      url: publicUrl,
+    };
   }
 }

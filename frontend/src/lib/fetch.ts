@@ -30,7 +30,7 @@ export const post = async (
   url: string,
   data: null | Record<
     string,
-    string | number | boolean | null | undefined | Date
+    string | number | boolean | null | undefined | Date | File
   >,
   customHeaders?: Record<string, string>,
 ) => {
@@ -45,7 +45,7 @@ export const put = async (
   url: string,
   data: null | Record<
     string,
-    string | number | boolean | null | undefined | Date
+    string | number | boolean | null | undefined | Date | File
   >,
   customHeaders?: Record<string, string>,
 ) => {
@@ -63,5 +63,27 @@ export const del = async (
   return fetch(import.meta.env.VITE_API_URL + url, {
     method: "DELETE",
     headers: getHeaders(customHeaders),
+  });
+};
+
+// multipart/form-data 요청 함수
+export const postFormData = async (
+  url: string,
+  data: FormData,
+  customHeaders?: Record<string, string>,
+) => {
+  // FormData를 사용할 때는 Content-Type을 설정하지 않아야 브라우저가 자동으로 boundary를 포함한 헤더를 설정합니다
+  const headers: Record<string, string> = { ...customHeaders };
+
+  // 토큰이 있으면 자동으로 추가
+  const accessToken = useAuthStore.getState().accessToken;
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  return fetch(import.meta.env.VITE_API_URL + url, {
+    method: "POST",
+    headers,
+    body: data, // FormData는 Content-Type을 자동으로 설정합니다 (boundary 포함)
   });
 };

@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateAuction } from "@/hooks/mutations/auction/useCreateAuction";
+import { useImageUpload } from "@/hooks/mutations/image/useImageUpload";
 import { useSubCategory } from "@/hooks/queries/useSubCategory";
 import { useTopCategory } from "@/hooks/queries/useTopCategory";
 import { toastError } from "@/lib/toast";
+import type { Image } from "@/models/auction";
 import { useRef, useState } from "react";
-
-type Image = { file: File; previewUrl: string };
 
 export default function CreateAuction() {
   const [title, setTitle] = useState("");
@@ -27,12 +27,21 @@ export default function CreateAuction() {
   const [startAt, setStartAt] = useState(new Date());
   const [endAt, setEndAt] = useState(new Date());
   const [buyoutPrice, setBuyoutPrice] = useState(0);
-  const [imageUrl, setImageUrl] = useState<Image | null>(null);
+  const [image, setImage] = useState<Image | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: topCategories } = useTopCategory();
   const { data: subCategories } = useSubCategory(categoryId);
-  const { mutate: createAuction } = useCreateAuction();
+  const { mutate: createAuction } = useCreateAuction({
+    onError: (error) => {
+      toastError(error.message);
+    },
+  });
+  const { mutateAsync: uploadImage } = useImageUpload({
+    onError: (error) => {
+      toastError(error.message);
+    },
+  });
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -73,13 +82,13 @@ export default function CreateAuction() {
 
     const file = e.target.files?.[0];
 
-    if (imageUrl) {
-      URL.revokeObjectURL(imageUrl.previewUrl);
+    if (image) {
+      URL.revokeObjectURL(image.previewUrl);
     }
-    setImageUrl({ file, previewUrl: URL.createObjectURL(file) });
+    setImage({ file, previewUrl: URL.createObjectURL(file) });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !title ||
       !description ||
@@ -106,8 +115,24 @@ export default function CreateAuction() {
       toastError("즉시 구매가는 시작가격보다 낮을 수 없습니다.");
       return;
     }
-    // TODO: 이미지 업로드 후 이미지 URL 설정
-    // TODO: 경매 생성 후 경매 상세 페이지로 이동
+
+    let imageUrl = null;
+    if (image) {
+      const upload = await uploadImage(image.file);
+      imageUrl = upload.url;
+    }
+    createAuction({
+      title,
+      description,
+      startPrice,
+      minBidStep,
+      buyoutPrice,
+      categoryId,
+      subCategoryId,
+      startAt,
+      endAt,
+      imageUrl,
+    });
   };
   return (
     <div className="flex flex-col gap-4">
@@ -239,9 +264,9 @@ export default function CreateAuction() {
       </div>
       <div className="flex flex-col gap-2">
         <Label>상품 이미지</Label>
-        {imageUrl && (
+        {image && (
           <img
-            src={imageUrl.previewUrl}
+            src={image.previewUrl}
             alt="이미지"
             className="h-100 w-100 object-cover"
           />

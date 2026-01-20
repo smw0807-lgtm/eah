@@ -10,10 +10,8 @@ export type AuctionStatus = (typeof AuctionStatus)[keyof typeof AuctionStatus];
 export type AuctionCreateInput = {
   title: string;
   description?: string | null;
-  status: AuctionStatus;
   startPrice: number | string;
   minBidStep?: number | string;
-  currentPrice?: number | string | null;
   buyoutPrice?: number | string | null;
   categoryId: number;
   subCategoryId: number;
@@ -21,3 +19,5 @@ export type AuctionCreateInput = {
   startAt: Date | string;
   endAt: Date | string;
 };
+
+export type Image = { file: File; previewUrl: string };
