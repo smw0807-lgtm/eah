@@ -21,3 +21,11 @@ export type AuctionCreateInput = {
 };
 
 export type Image = { file: File; previewUrl: string };
+
+export type SearchAuctionsQuery = {
+  sort?: string;
+  category?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+};
