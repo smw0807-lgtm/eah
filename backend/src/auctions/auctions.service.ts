@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Auction, AuctionStatus } from 'generated/prisma/client';
+import { Auction, AuctionStatus, Prisma } from 'generated/prisma/client';
 import { AuctionCreateInput } from 'generated/prisma/models';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SearchAuctionsQuery } from './models/search.model';
@@ -17,22 +17,16 @@ export class AuctionsService {
     maxPrice: SearchAuctionsQuery['maxPrice'],
     search: SearchAuctionsQuery['search'],
   ): Promise<Auction[]> {
+    const where: Prisma.AuctionWhereInput = {
+      ...(category && category.length > 0
+        ? { category: { code: category } }
+        : {}),
+      ...(minPrice && minPrice > 0 ? { currentPrice: { gte: minPrice } } : {}),
+      ...(maxPrice && maxPrice > 0 ? { currentPrice: { lte: maxPrice } } : {}),
+      ...(search && search.length > 0 ? { title: { contains: search } } : {}),
+    };
     const auctions = await this.prisma.auction.findMany({
-      orderBy: {
-        [sort as keyof Auction]: sort,
-      } as any,
-      where: {
-        ...(category && category.length > 0
-          ? { category: { code: category } }
-          : {}),
-        ...(minPrice && minPrice > 0
-          ? { currentPrice: { gte: minPrice } }
-          : {}),
-        ...(maxPrice && maxPrice > 0
-          ? { currentPrice: { lte: maxPrice } }
-          : {}),
-        ...(search && search.length > 0 ? { title: { contains: search } } : {}),
-      },
+      where,
       include: {
         seller: {
           select: {
