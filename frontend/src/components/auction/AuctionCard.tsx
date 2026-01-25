@@ -124,22 +124,38 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
           </div>
         </CardContent>
 
-        <CardFooter className="text-muted-foreground flex items-center justify-between border-t pt-3 text-xs">
-          <div className="flex items-center gap-1.5">
-            <Clock className="size-3.5" />
-            <span>{getTimeRemaining()}</span>
+        <CardFooter className="text-muted-foreground flex flex-col items-center justify-between border-t pt-3 text-xs">
+          {/* 등록일 */}
+          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+            <span>
+              <span>등록일: </span>
+              {new Date(auction.createdAt).toLocaleDateString("ko-KR", {
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
           </div>
-          <span>
-            {new Date(auction.startAt).toLocaleDateString("ko-KR", {
-              month: "short",
-              day: "numeric",
-            })}
-            {" ~ "}
-            {new Date(auction.endAt).toLocaleDateString("ko-KR", {
-              month: "short",
-              day: "numeric",
-            })}
-          </span>
+          {/* 경매 기간 */}
+          <div className="flex items-center gap-2">
+            <span>경매 기간: </span>
+            <span>
+              {new Date(auction.startAt).toLocaleDateString("ko-KR", {
+                month: "short",
+                day: "numeric",
+              })}
+              {" ~ "}
+              {new Date(auction.endAt).toLocaleDateString("ko-KR", {
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-1.5">
+              <Clock className="size-3.5" />
+              <span>{getTimeRemaining()}</span>
+            </div>
+          </div>
         </CardFooter>
       </Card>
     </Link>
