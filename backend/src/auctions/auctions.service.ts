@@ -78,11 +78,17 @@ export class AuctionsService {
     auction: AuctionCreateInput & { categoryId: number; subCategoryId: number },
     sellerId: number,
   ): Promise<Auction> {
+    // 경매 시작일이 현재 시간보다 이전일 경우, 경매 상태를 OPEN으로 변경
+    if (new Date(auction.startAt) < new Date()) {
+      auction.status = AuctionStatus.OPEN;
+    } else {
+      auction.status = AuctionStatus.SCHEDULED;
+    }
     const newAuction = await this.prisma.auction.create({
       data: {
         title: auction.title,
         description: auction.description ?? null,
-        status: AuctionStatus.SCHEDULED,
+        status: auction.status,
         startPrice: auction.startPrice,
         minBidStep: auction.minBidStep,
         currentPrice: auction.startPrice ?? null,
