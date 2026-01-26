@@ -2,7 +2,7 @@ import AddAuctionButton from "@/components/side-menu/AddAuctionButton";
 import CategorySection from "@/components/side-menu/CategorySection";
 import FilterSection from "@/components/side-menu/FilterSection";
 import AuctionCard from "@/components/auction/AuctionCard";
-import { useGetAuctions } from "@/hooks/queries/useGetAuctions";
+import { useGetAuctions } from "@/hooks/queries/auction/useGetAuctions";
 import { useTopCategory } from "@/hooks/queries/useTopCategory";
 import type { Auction, SearchAuctionsQuery } from "@/models/auction";
 import { useEffect, useState } from "react";
