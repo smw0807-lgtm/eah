@@ -2,6 +2,7 @@ import DefaultLayout from "@/layouts/default";
 import UserLayout from "@/layouts/UserLayout";
 import Home from "@/pages";
 import CreateAuction from "@/pages/auction/CreateAuction";
+import AuctionDetail from "@/pages/auction/Detail";
 import { Route, Routes } from "react-router";
 export default function Router() {
   return (
@@ -11,6 +12,7 @@ export default function Router() {
 
         <Route element={<UserLayout />}>
           <Route path="/auction/create" element={<CreateAuction />} />
+          <Route path="/auctions/:id" element={<AuctionDetail />} />
         </Route>
       </Route>
     </Routes>
