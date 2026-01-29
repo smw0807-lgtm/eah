@@ -140,6 +140,18 @@ export class AuctionsService {
             email: true,
           },
         },
+        category: true,
+        subCategory: true,
+        bids: {
+          include: {
+            bidder: true,
+          },
+        },
+        winningBid: {
+          include: {
+            bidder: true,
+          },
+        },
       },
     });
     if (!auction) {
