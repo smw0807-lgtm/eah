@@ -1,5 +1,5 @@
 import { useGetAuction } from "@/hooks/queries/auction/useGetAuction";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
@@ -11,11 +11,13 @@ import {
   Calendar,
   TrendingUp,
   ShoppingCart,
+  ArrowLeft,
 } from "lucide-react";
 import type { Auction, Bid } from "@/models/auction";
 import { statusColors, statusLabels } from "@/lib/constants";
 
 export default function AuctionDetail() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data: auction, isLoading: isAuctionLoading } = useGetAuction(
     Number(id),
@@ -61,6 +63,12 @@ export default function AuctionDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-4 flex flex-col items-end">
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          <ArrowLeft className="size-4" />
+          뒤로가기
+        </Button>
+      </div>
       <div className="grid gap-8 lg:grid-cols-2">
         {/* 좌측: 이미지 */}
         <div className="space-y-4">
