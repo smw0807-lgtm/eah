@@ -19,11 +19,17 @@ import type { Auction, Bid } from "@/models/auction";
 import { statusColors, statusLabels } from "@/lib/constants";
 import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
 import { toastError } from "@/lib/toast";
+import { useOpenBidModal, useBidModalActions } from "@/stores/bid-modal";
 
 export default function AuctionDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
   const auctionId = Number(id);
+
+  const openBidModal = useOpenBidModal();
+  const { setCurrentPrice, setMinBidStep, setNextBidAmount } =
+    useBidModalActions();
+
   const { data: auction, isLoading: isAuctionLoading } =
     useGetAuction(auctionId);
 
@@ -73,6 +79,10 @@ export default function AuctionDetail() {
       toastError("연결이 되지 않아 입찰을 할 수 없습니다.");
       return;
     }
+    setCurrentPrice(parseInt(auction.currentPrice || auction.startPrice));
+    setMinBidStep(parseInt(auction.minBidStep));
+    setNextBidAmount(getNextBidAmount(auction));
+    openBidModal();
   };
 
   const handleBuyout = () => {
