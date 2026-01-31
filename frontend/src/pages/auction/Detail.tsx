@@ -18,6 +18,7 @@ import {
 import type { Auction, Bid } from "@/models/auction";
 import { statusColors, statusLabels } from "@/lib/constants";
 import { useAuctionWebSocket } from "@/hooks/useAuctionWebSocket";
+import { toastError } from "@/lib/toast";
 
 export default function AuctionDetail() {
   const navigate = useNavigate();
@@ -65,6 +66,20 @@ export default function AuctionDetail() {
       : parseInt(auction.startPrice);
     const minBidStep = parseInt(auction.minBidStep);
     return currentPrice + minBidStep;
+  };
+
+  const handleBid = () => {
+    if (!isConnected) {
+      toastError("연결이 되지 않아 입찰을 할 수 없습니다.");
+      return;
+    }
+  };
+
+  const handleBuyout = () => {
+    if (!isConnected) {
+      toastError("연결이 되지 않아 즉시구매를 할 수 없습니다.");
+      return;
+    }
   };
 
   return (
@@ -239,12 +254,17 @@ export default function AuctionDetail() {
           {/* 입찰 버튼 */}
           {auction.status === "OPEN" && (
             <div className="flex gap-3">
-              <Button size="lg" className="flex-1">
+              <Button size="lg" className="flex-1" onClick={handleBid}>
                 <TrendingUp className="size-5" />
                 입찰하기
               </Button>
               {auction.buyoutPrice && (
-                <Button size="lg" variant="outline" className="flex-1">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleBuyout}
+                >
                   <ShoppingCart className="size-5" />
                   즉시구매
                 </Button>
