@@ -60,7 +60,7 @@ export class AuctionsGateway
 
       const payload = this.authService.verifyToken(token);
 
-      client.data.userId = payload.id;
+      client.data.userInfo = payload;
       this.logger.log(`Client ${client.id} 연결됨 (userId: ${payload.id})`);
     } catch (error: any) {
       this.logger.warn(
