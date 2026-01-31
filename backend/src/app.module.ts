@@ -12,7 +12,6 @@ import { BidsModule } from './bids/bids.module';
 import { AuctionsModule } from './auctions/auctions.module';
 import { ImagesModule } from './images/images.module';
 import { SupabaseModule } from './supabase/supabase.module';
-import { BidModule } from './bid/bid.module';
 @Module({
   imports: [
     ConfigModule,
@@ -26,7 +25,6 @@ import { BidModule } from './bid/bid.module';
     AuctionsModule,
     ImagesModule,
     SupabaseModule,
-    BidModule,
   ],
   controllers: [AppController],
   providers: [AppService],
