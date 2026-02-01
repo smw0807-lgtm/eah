@@ -66,6 +66,14 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
             <Tag className="size-12 opacity-50" />
           </div>
         )}
+        {/* 종료 상태일 때 큰 텍스트 오버레이 */}
+        {auction.status === "CLOSED" && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <span className="text-4xl font-bold text-white drop-shadow-lg">
+              종료
+            </span>
+          </div>
+        )}
         {/* 상태 배지 */}
         <div className="absolute top-2 right-2">
           <span
