@@ -20,7 +20,6 @@ export class AuctionsController {
   constructor(private readonly auctionsService: AuctionsService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
   async getAuctions(
     @Query('category')
     category: SearchAuctionsQuery['category'],
@@ -82,7 +81,6 @@ export class AuctionsController {
 
   // 현재 진행중인 경매 상품인지 확인
   @Get('current')
-  @UseGuards(AuthGuard)
   async isCurrentAuction(
     @Query('auctionId')
     auctionId: number,
