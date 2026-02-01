@@ -5,19 +5,21 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { useIsCurrentAuction } from "@/hooks/queries/auction/useIsCurrentAuction";
-import { toastError } from "@/lib/toast";
+import { toastWarning, toastError } from "@/lib/toast";
 import type { Auction } from "@/models/auction";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Clock, User, Tag } from "lucide-react";
 import { useNavigate } from "react-router";
 import { statusColors, statusLabels } from "@/lib/constants";
+import { useAuthIsAuthenticated } from "@/stores/auth";
 
 interface AuctionCardProps {
   auction: Auction;
 }
 
 export default function AuctionCard({ auction }: AuctionCardProps) {
+  const isAuthenticated = useAuthIsAuthenticated();
   const { data: isCurrentAuction } = useIsCurrentAuction(auction.id);
   const navigate = useNavigate();
 
@@ -34,6 +36,10 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
   };
 
   const handleClick = () => {
+    if (!isAuthenticated) {
+      toastWarning("로그인 후 이용해주세요.");
+      return;
+    }
     if (isCurrentAuction) {
       navigate(`/auctions/${auction.id}`);
     } else {
