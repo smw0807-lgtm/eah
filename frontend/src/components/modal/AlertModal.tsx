@@ -28,7 +28,9 @@ export default function AlertModal() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{store.title}</AlertDialogTitle>
-          <AlertDialogDescription>{store.description}</AlertDialogDescription>
+          <AlertDialogDescription
+            dangerouslySetInnerHTML={{ __html: store.description }}
+          />
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancelClick}>
