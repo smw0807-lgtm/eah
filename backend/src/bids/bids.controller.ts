@@ -139,23 +139,43 @@ export class BidsController {
   ) {
     const { auctionId, amount } = body;
     if (!auctionId || !amount) {
-      throw new BadRequestException('Invalid request body');
+      throw new BadRequestException('Auction ID and amount are required');
     }
     if (amount <= 0) {
-      throw new BadRequestException('Amount must be greater than 0');
+      throw new BadRequestException('입찰 금액은 0원 이상이어야 합니다.');
     }
     if (amount > 1000000000) {
-      throw new BadRequestException('Amount must be less than 1000000000');
+      throw new BadRequestException('입찰 금액은 10억원을 초과할 수 없습니다.');
     }
     if (amount % 100 !== 0) {
-      throw new BadRequestException('Amount must be a multiple of 100');
+      throw new BadRequestException('입찰 금액은 100원 단위로 입력해주세요.');
     }
 
-    return this.bidsService.createBid({
+    // 사용자 현재 잔액 조회
+    const accountBalance = await this.accountsService.getAccountBalance(
+      +user.id,
+    );
+    if (accountBalance && accountBalance.toNumber() < amount) {
+      throw new BadRequestException('잔액이 부족합니다.');
+    }
+
+    // 사용자 락 잔액 조회
+    const accountLockedBalance =
+      await this.accountsService.getAccountLockedBalance(+user.id);
+    if (accountLockedBalance && accountLockedBalance.toNumber() < amount) {
+      throw new BadRequestException('락 잔액이 부족합니다.');
+    }
+
+    // 사용자 락 잔액 업데이트
+    await this.accountsService.updateAccountLockedBalance(+user.id, amount);
+
+    // 입찰 생성
+    const createdBid = await this.bidsService.createBid({
       auctionId: +auctionId,
       bidderId: user.id,
-      amount: +amount,
+      amount: amount,
     });
+    return createdBid;
   }
 
   // 입찰 수정

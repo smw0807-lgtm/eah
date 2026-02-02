@@ -37,8 +37,13 @@ export default function AuctionDetail() {
   const { data: auction, isLoading: isAuctionLoading } =
     useGetAuction(auctionId);
   const { mutate: createBuyout } = useCreateBuyout({
-    onSuccess: () => {
-      toastSuccess("즉시구매가 완료되었습니다.");
+    onSuccess: (response) => {
+      if (response && response.statusCode !== 200) {
+        toastError(response.message as string);
+        return;
+      } else {
+        toastSuccess("즉시구매가 완료되었습니다.");
+      }
     },
     onError: (error) => {
       toastError(error.message);

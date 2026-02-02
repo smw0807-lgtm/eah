@@ -30,11 +30,17 @@ export default function BidModal() {
   }, [nextBidAmount, isCustomAmount]);
 
   const { mutate: createBid, isPending } = useCreateBid({
-    onSuccess: () => {
-      toastSuccess("입찰이 완료되었습니다.");
-      bidModal.actions.close();
-      setBidAmount(nextBidAmount);
-      setIsCustomAmount(false);
+    onSuccess: (response) => {
+      console.log(response);
+      if (response && response.statusCode !== 200) {
+        toastError(response.message as string);
+        return;
+      } else {
+        toastSuccess("입찰이 완료되었습니다.");
+        bidModal.actions.close();
+        setBidAmount(nextBidAmount);
+        setIsCustomAmount(false);
+      }
     },
     onError: (error: any) => {
       toastError(error?.message || "입찰에 실패했습니다.");
