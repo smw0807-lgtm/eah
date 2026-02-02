@@ -160,6 +160,19 @@ export class AuctionsService {
     return auction;
   }
 
+  // 경매 상품 즉시구매 가격 조회
+  async getAuctionBuyoutPrice(
+    auctionId: number,
+  ): Promise<Prisma.Decimal | null> {
+    const auction = await this.prisma.auction.findUnique({
+      where: { id: auctionId },
+    });
+    if (!auction) {
+      throw new NotFoundException('경매 상품을 찾을 수 없습니다.');
+    }
+    return auction.buyoutPrice;
+  }
+
   // 경매 상품 winning_bid_id 업데이트
   async updateAuctionWinningBidId(
     auctionId: number,

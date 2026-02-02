@@ -83,6 +83,26 @@ export class BidsController {
       throw new BadRequestException('Auction ID is required');
     }
     const auctionId = body.auctionId;
+    // 경매 상품 즉시구매 가격 조회
+    const buyoutPrice =
+      await this.auctionsService.getAuctionBuyoutPrice(+auctionId);
+    if (!buyoutPrice) {
+      throw new BadRequestException('즉시구매 가격이 설정되지 않았습니다.');
+    }
+    // 사용자 잔액 조회
+    const accountBalance = await this.accountsService.getAccountBalance(
+      user.id,
+    );
+    if (accountBalance && accountBalance < buyoutPrice) {
+      throw new BadRequestException('잔액이 부족합니다.');
+    }
+    // 사용자 락 잔액 조회
+    const accountLockedBalance =
+      await this.accountsService.getAccountLockedBalance(user.id);
+    if (accountLockedBalance && accountLockedBalance < buyoutPrice) {
+      throw new BadRequestException('락 잔액이 부족합니다.');
+    }
+
     // 즉시구매 생성
     const createdBid = await this.bidsService.createBuyout(+auctionId, user.id);
     // WebSocket으로 실시간 업데이트 브로드캐스트
