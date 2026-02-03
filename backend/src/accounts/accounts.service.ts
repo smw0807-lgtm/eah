@@ -64,11 +64,35 @@ export class AccountsService {
     return account?.lockedAmount;
   }
 
-  // 계좌 락 잔액 업데이트
+  // 계좌 락 잔액 업데이트 (설정)
   async updateAccountLockedBalance(userId: number, amount: number) {
     const account = await this.prisma.userAccount.update({
       where: { userId },
       data: { lockedAmount: amount },
+    });
+    return account;
+  }
+
+  // lockedAmount 증가 및 currentAmount 감소 (입찰 시)
+  async incrementLockedAmount(userId: number, amount: number) {
+    const account = await this.prisma.userAccount.update({
+      where: { userId },
+      data: {
+        lockedAmount: { increment: new Prisma.Decimal(amount) },
+        currentAmount: { decrement: new Prisma.Decimal(amount) },
+      },
+    });
+    return account;
+  }
+
+  // lockedAmount 감소 및 currentAmount 증가 (입찰 실패 시)
+  async decrementLockedAmount(userId: number, amount: number) {
+    const account = await this.prisma.userAccount.update({
+      where: { userId },
+      data: {
+        lockedAmount: { decrement: new Prisma.Decimal(amount) },
+        currentAmount: { increment: new Prisma.Decimal(amount) },
+      },
     });
     return account;
   }

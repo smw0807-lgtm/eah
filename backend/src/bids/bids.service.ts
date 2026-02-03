@@ -140,7 +140,15 @@ export class BidsService {
     auctionId: number;
     bidderId: number;
     amount: number | string | Prisma.Decimal;
-  }): Promise<Bid> {
+  }): Promise<
+    Bid & { previousBidderId?: number; previousAmount?: Prisma.Decimal }
+  > {
+    // 이전 최고 입찰 조회
+    const previousHighestBid = await this.prisma.bid.findFirst({
+      where: { auctionId: data.auctionId },
+      orderBy: { amount: 'desc' },
+    });
+
     const createdBid = await this.prisma.bid.create({
       data: {
         auctionId: data.auctionId,
@@ -159,6 +167,20 @@ export class BidsService {
 
     // WebSocket으로 실시간 업데이트 브로드캐스트
     await this.auctionsGateway.handleBidCreated(data.auctionId);
+
+    // 이전 입찰자가 있고, 새로운 입찰이 더 높으면 이전 입찰자의 잠금 해제
+    if (
+      previousHighestBid &&
+      previousHighestBid.bidderId !== data.bidderId &&
+      new Prisma.Decimal(data.amount).gt(previousHighestBid.amount)
+    ) {
+      // 이전 입찰자의 잠금 해제는 컨트롤러에서 처리
+      return {
+        ...createdBid,
+        previousBidderId: previousHighestBid.bidderId,
+        previousAmount: previousHighestBid.amount,
+      } as Bid & { previousBidderId: number; previousAmount: Prisma.Decimal };
+    }
 
     return createdBid;
   }

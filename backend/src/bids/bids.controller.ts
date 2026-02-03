@@ -12,7 +12,13 @@ import { BadRequestException } from '@nestjs/common';
 import { Body } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CurrentUser } from 'src/auth/decorator/current.user';
-import { AuctionStatus, Prisma, Role, User } from 'generated/prisma/client';
+import {
+  AuctionStatus,
+  Bid,
+  Prisma,
+  Role,
+  User,
+} from 'generated/prisma/client';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { RBAC } from 'src/auth/decorator/rbac';
 import { AuctionsGateway } from 'src/auctions/auctions.gateway';
@@ -89,22 +95,21 @@ export class BidsController {
     if (!buyoutPrice) {
       throw new BadRequestException('즉시구매 가격이 설정되지 않았습니다.');
     }
+
     // 사용자 잔액 조회
     const accountBalance = await this.accountsService.getAccountBalance(
       user.id,
     );
-    if (accountBalance && accountBalance < buyoutPrice) {
-      throw new BadRequestException('잔액이 부족합니다.');
-    }
-    // 사용자 락 잔액 조회
     const accountLockedBalance =
       await this.accountsService.getAccountLockedBalance(user.id);
 
+    // 사용 가능한 잔액 계산 (currentAmount - lockedAmount)
     const accountLockedBalanceAmount = accountLockedBalance?.toNumber() ?? 0;
     const accountBalanceAmount = accountBalance?.toNumber() ?? 0;
-    const accountBalanceMinusLockedBalance =
-      accountBalanceAmount - accountLockedBalanceAmount;
-    if (accountBalanceMinusLockedBalance < buyoutPrice.toNumber()) {
+    const availableBalance = accountBalanceAmount - accountLockedBalanceAmount;
+    const buyoutPriceAmount = buyoutPrice.toNumber();
+
+    if (availableBalance < buyoutPriceAmount) {
       throw new BadRequestException(
         '현재 잔액이 즉시구매 금액보다 부족합니다.',
       );
@@ -112,18 +117,32 @@ export class BidsController {
 
     // 즉시구매 생성
     const createdBid = await this.bidsService.createBuyout(+auctionId, user.id);
+
+    // 즉시구매 시 이전 입찰자들의 잠금 해제
+    const previousBids = await this.bidsService.getAuctionBids(+auctionId);
+    for (const bid of previousBids) {
+      if (bid.bidderId !== user.id && bid.id !== createdBid.id) {
+        await this.accountsService.decrementLockedAmount(
+          bid.bidderId,
+          bid.amount.toNumber(),
+        );
+      }
+    }
+
+    // 즉시구매 가격만큼 currentAmount 차감
+    await this.accountsService.updateAccount(user.id, {
+      currentAmount: {
+        decrement: new Prisma.Decimal(createdBid.amount.toString()),
+      },
+    });
+
     // WebSocket으로 실시간 업데이트 브로드캐스트
     await this.auctionsGateway.handleBidCreated(+auctionId);
     await this.auctionsGateway.handleAuctionStatusChange(
       +auctionId,
       AuctionStatus.CLOSED as AuctionStatus,
     );
-    // 내 자금 즉시구매 가격만큼 차감
-    await this.accountsService.updateAccount(user.id, {
-      currentAmount: {
-        decrement: new Prisma.Decimal(createdBid.amount.toString()),
-      },
-    });
+
     // 경매 상품 winning_bid_id 업데이트
     await this.auctionsService.updateAuctionWinningBidId(
       +auctionId,
@@ -162,33 +181,45 @@ export class BidsController {
     const accountBalance = await this.accountsService.getAccountBalance(
       +user.id,
     );
-    if (accountBalance && accountBalance.toNumber() < amount) {
-      throw new BadRequestException('잔액이 부족합니다.');
-    }
-
-    // 사용자 락 잔액 조회
     const accountLockedBalance =
       await this.accountsService.getAccountLockedBalance(+user.id);
-    const accountLockedBalanceAmount = accountLockedBalance?.toNumber() ?? 0;
 
-    // 현재 잔액 - 락 잔액
+    // 사용 가능한 잔액 계산 (currentAmount - lockedAmount)
     const accountBalanceAmount = accountBalance?.toNumber() ?? 0;
-    const accountBalanceMinusLockedBalance =
-      accountBalanceAmount - accountLockedBalanceAmount;
-    if (accountBalanceMinusLockedBalance < amount) {
+    const accountLockedBalanceAmount = accountLockedBalance?.toNumber() ?? 0;
+    const availableBalance = accountBalanceAmount - accountLockedBalanceAmount;
+
+    if (availableBalance < amount) {
       throw new BadRequestException('현재 잔액이 입찰 금액보다 부족합니다.');
     }
 
-    // 사용자 락 잔액 업데이트
-    await this.accountsService.updateAccountLockedBalance(+user.id, amount);
-
-    // 입찰 생성
+    // 입찰 생성 (이전 입찰자 정보 포함)
     const createdBid = await this.bidsService.createBid({
       auctionId: +auctionId,
       bidderId: user.id,
       amount: amount,
     });
-    return createdBid;
+
+    // 이전 입찰자가 있고, 새로운 입찰이 더 높으면 이전 입찰자의 잠금 해제
+    const bidWithPrevious = createdBid as Bid & {
+      previousBidderId?: number;
+      previousAmount?: Prisma.Decimal;
+    };
+    if (bidWithPrevious.previousBidderId && bidWithPrevious.previousAmount) {
+      await this.accountsService.decrementLockedAmount(
+        bidWithPrevious.previousBidderId,
+        bidWithPrevious.previousAmount.toNumber(),
+      );
+    }
+
+    // 현재 사용자의 잔액 잠금 (currentAmount 감소, lockedAmount 증가)
+    await this.accountsService.incrementLockedAmount(+user.id, amount);
+
+    // 응답에서 내부 정보 제거
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { previousBidderId, previousAmount, ...responseBid } =
+      bidWithPrevious;
+    return responseBid;
   }
 
   // 입찰 수정
