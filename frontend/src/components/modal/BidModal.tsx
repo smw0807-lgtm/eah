@@ -32,7 +32,7 @@ export default function BidModal() {
   const { mutate: createBid, isPending } = useCreateBid({
     onSuccess: (response) => {
       console.log(response);
-      if (response && response.statusCode !== 200) {
+      if (response && response.statusCode === 400) {
         toastError(response.message as string);
         return;
       } else {
