@@ -99,8 +99,15 @@ export class BidsController {
     // 사용자 락 잔액 조회
     const accountLockedBalance =
       await this.accountsService.getAccountLockedBalance(user.id);
-    if (accountLockedBalance && accountLockedBalance < buyoutPrice) {
-      throw new BadRequestException('락 잔액이 부족합니다.');
+
+    const accountLockedBalanceAmount = accountLockedBalance?.toNumber() ?? 0;
+    const accountBalanceAmount = accountBalance?.toNumber() ?? 0;
+    const accountBalanceMinusLockedBalance =
+      accountBalanceAmount - accountLockedBalanceAmount;
+    if (accountBalanceMinusLockedBalance < buyoutPrice.toNumber()) {
+      throw new BadRequestException(
+        '현재 잔액이 즉시구매 금액보다 부족합니다.',
+      );
     }
 
     // 즉시구매 생성
