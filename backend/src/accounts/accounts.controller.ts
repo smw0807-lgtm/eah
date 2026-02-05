@@ -21,6 +21,6 @@ export class AccountsController {
   @Get()
   @UseGuards(AuthGuard)
   async getAccount(@CurrentUser() user: User) {
-    return this.accountsService.getAccount(user.id);
+    return this.accountsService.getAccount(+user.id);
   }
 }

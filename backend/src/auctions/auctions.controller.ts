@@ -88,6 +88,13 @@ export class AuctionsController {
     return this.auctionsService.isCurrentAuction(+auctionId);
   }
 
+  // 내가 판매한 경매 목록 조회
+  @Get('my-sales')
+  @UseGuards(AuthGuard)
+  async getMySales(@CurrentUser() user: User) {
+    return this.auctionsService.getMySales(+user.id);
+  }
+
   // 경매 상세 정보 조회
   @Get(':id')
   @UseGuards(AuthGuard)
@@ -96,12 +103,5 @@ export class AuctionsController {
     id: number,
   ) {
     return this.auctionsService.getAuctionDetail(+id);
-  }
-
-  // 내가 판매한 경매 목록 조회
-  @Get('my-sales')
-  @UseGuards(AuthGuard)
-  async getMySales(@CurrentUser() user: User) {
-    return this.auctionsService.getMySales(user.id);
   }
 }

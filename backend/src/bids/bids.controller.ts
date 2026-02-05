@@ -264,6 +264,6 @@ export class BidsController {
   @Get('my-bids')
   @UseGuards(AuthGuard)
   async getMyBids(@CurrentUser() user: User) {
-    return this.bidsService.getMyBids(user.id);
+    return this.bidsService.getMyBids(+user.id);
   }
 }
