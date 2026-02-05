@@ -14,6 +14,38 @@ export class UsersService {
   ) {}
 
   // 회원정보 조회
+  async getMyProfile(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        nickname: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+        account: {
+          select: {
+            currentAmount: true,
+            lockedAmount: true,
+          },
+        },
+        auctions: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            status: true,
+          },
+        },
+        bids: true,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
   // 회원정보 수정
   // 회원탈퇴
   // 비밀번호 변경

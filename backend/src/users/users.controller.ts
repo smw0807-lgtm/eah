@@ -12,6 +12,6 @@ export class UsersController {
   @Get('me')
   @UseGuards(AuthGuard)
   async getMyProfile(@CurrentUser() user: User) {
-    return this.usersService.getUser('id', user.id.toString());
+    return this.usersService.getMyProfile(+user.id);
   }
 }
