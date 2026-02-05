@@ -215,4 +215,20 @@ export class BidsService {
       where: { id },
     });
   }
+
+  // 내가 입찰한 경매 목록 조회
+  async getMyBids(userId: number): Promise<Bid[]> {
+    const bids = await this.prisma.bid.findMany({
+      where: { bidderId: userId },
+      include: {
+        auction: true,
+        bidder: true,
+        winningFor: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return bids;
+  }
 }

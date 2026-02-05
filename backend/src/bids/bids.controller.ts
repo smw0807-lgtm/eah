@@ -259,4 +259,11 @@ export class BidsController {
   async deleteBid(@Param('id') id: number) {
     return this.bidsService.deleteBid(+id);
   }
+
+  // 내가 입찰한 경매 목록 조회
+  @Get('my-bids')
+  @UseGuards(AuthGuard)
+  async getMyBids(@CurrentUser() user: User) {
+    return this.bidsService.getMyBids(user.id);
+  }
 }
