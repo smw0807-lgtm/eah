@@ -24,21 +24,6 @@ export class UsersService {
         email: true,
         createdAt: true,
         updatedAt: true,
-        account: {
-          select: {
-            currentAmount: true,
-            lockedAmount: true,
-          },
-        },
-        auctions: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            status: true,
-          },
-        },
-        bids: true,
       },
     });
     if (!user) {
