@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gavel, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Gavel, Calendar, ChevronRight } from "lucide-react";
 import { statusColors, statusLabels } from "@/lib/constants";
 import { useNavigate } from "react-router";
 import { format } from "date-fns";
@@ -25,9 +26,10 @@ interface Bid {
 
 interface MyBidsListProps {
   bids: Bid[];
+  limit?: number;
 }
 
-export default function MyBidsList({ bids }: MyBidsListProps) {
+export default function MyBidsList({ bids, limit }: MyBidsListProps) {
   const navigate = useNavigate();
 
   const formatPrice = (price: string | number) => {
@@ -38,6 +40,9 @@ export default function MyBidsList({ bids }: MyBidsListProps) {
     return format(new Date(dateString), "yyyy.MM.dd HH:mm", { locale: ko });
   };
 
+  const displayedBids = limit ? bids?.slice(0, limit) || [] : bids || [];
+  const hasMore = limit ? bids && bids.length > limit : false;
+
   return (
     <Card>
       <CardHeader>
@@ -47,9 +52,9 @@ export default function MyBidsList({ bids }: MyBidsListProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {bids && bids.length > 0 ? (
+        {displayedBids.length > 0 ? (
           <div className="space-y-4">
-            {bids.map((bid) => (
+            {displayedBids.map((bid) => (
               <div
                 key={bid.id}
                 className="group hover:bg-muted/50 flex cursor-pointer gap-4 rounded-lg border p-4 transition-all hover:shadow-md"
@@ -139,6 +144,18 @@ export default function MyBidsList({ bids }: MyBidsListProps) {
                 </div>
               </div>
             ))}
+            {hasMore && (
+              <div className="pt-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate("/mypage/bids")}
+                >
+                  더보기
+                  <ChevronRight className="ml-2 size-4" />
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-muted-foreground py-8 text-center">

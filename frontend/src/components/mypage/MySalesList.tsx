@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ShoppingBag, ChevronRight } from "lucide-react";
 import { statusColors, statusLabels } from "@/lib/constants";
 import { useNavigate } from "react-router";
 import { format } from "date-fns";
@@ -22,9 +23,10 @@ interface Auction {
 
 interface MySalesListProps {
   sales: Auction[];
+  limit?: number;
 }
 
-export default function MySalesList({ sales }: MySalesListProps) {
+export default function MySalesList({ sales, limit }: MySalesListProps) {
   const navigate = useNavigate();
 
   const formatPrice = (price: string | number | null) => {
@@ -36,6 +38,9 @@ export default function MySalesList({ sales }: MySalesListProps) {
     return format(new Date(dateString), "yyyy.MM.dd HH:mm", { locale: ko });
   };
 
+  const displayedSales = limit ? sales?.slice(0, limit) || [] : sales || [];
+  const hasMore = limit ? sales && sales.length > limit : false;
+
   return (
     <Card>
       <CardHeader>
@@ -45,9 +50,9 @@ export default function MySalesList({ sales }: MySalesListProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {sales && sales.length > 0 ? (
+        {displayedSales.length > 0 ? (
           <div className="space-y-4">
-            {sales.map((auction) => (
+            {displayedSales.map((auction) => (
               <div
                 key={auction.id}
                 className="group hover:bg-muted/50 flex cursor-pointer gap-4 rounded-lg border p-4 transition-all hover:shadow-md"
@@ -106,7 +111,8 @@ export default function MySalesList({ sales }: MySalesListProps) {
                       <span className="text-muted-foreground font-medium">
                         현재가:
                       </span>{" "}
-                      {formatPrice(auction.currentPrice || auction.startPrice)}원
+                      {formatPrice(auction.currentPrice || auction.startPrice)}
+                      원
                     </div>
                     {auction.winningBid && (
                       <div className="font-semibold text-green-600 dark:text-green-400">
@@ -131,6 +137,18 @@ export default function MySalesList({ sales }: MySalesListProps) {
                 </div>
               </div>
             ))}
+            {hasMore && (
+              <div className="pt-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate("/mypage/sales")}
+                >
+                  더보기
+                  <ChevronRight className="ml-2 size-4" />
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-muted-foreground py-8 text-center">

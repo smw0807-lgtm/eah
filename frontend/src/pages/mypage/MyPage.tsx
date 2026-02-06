@@ -52,8 +52,8 @@ export default function MyPage() {
 
         {/* 우측: 판매 내역 및 입찰 내역 */}
         <div className="space-y-6 lg:col-span-2">
-          <MySalesList sales={mySales || []} />
-          <MyBidsList bids={myBids || []} />
+          <MySalesList sales={mySales || []} limit={3} />
+          <MyBidsList bids={myBids || []} limit={3} />
         </div>
       </div>
     </div>
