@@ -38,7 +38,7 @@ export default function AuctionDetail() {
     useGetAuction(auctionId);
   const { mutate: createBuyout } = useCreateBuyout({
     onSuccess: (response) => {
-      if (response && response.statusCode !== 200) {
+      if (response && response.statusCode === 400) {
         toastError(response.message as string);
         return;
       } else {
