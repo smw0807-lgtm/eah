@@ -131,12 +131,15 @@ export class AccountsService {
     return account;
   }
 
-  // 락 금액 초기화
-  async resetLockedAmount(userId: number) {
+  // 금액 차감
+  async deductCurrentAmount(userId: number, amount: number) {
     const account = await this.prisma.userAccount.update({
       where: { userId },
-      data: { lockedAmount: 0 },
+      data: { currentAmount: { decrement: new Prisma.Decimal(amount) } },
     });
+    this.logger.log(
+      `사용자 ${userId}의 잔액 ${amount}원 차감 완료. 남은 잔액: ${account.currentAmount.toString()}`,
+    );
     return account;
   }
 }

@@ -121,46 +121,26 @@ export class BidsController {
       throw new BadRequestException('경매를 찾을 수 없습니다.');
     }
 
-    const sellerId = auction.sellerId;
-    const buyerId = user.id;
-
-    // 즉시구매 생성
-    const createdBid = await this.bidsService.createBuyout(+auctionId, buyerId);
-    const buyoutAmount = createdBid.amount.toNumber();
-
-    // 즉시구매 시 이전 입찰자들의 잠금 해제
-    // 단, 판매자가 자신의 경매에 입찰한 경우는 해제하지 않음 (판매자가 자신에게 돈을 주는 것이므로)
     const previousBids = await this.bidsService.getAuctionBids(+auctionId);
-    for (const bid of previousBids) {
-      if (bid.id !== createdBid.id) {
-        // 판매자가 자신의 경매에 입찰한 경우는 해제하지 않음
-        if (bid.bidderId === sellerId) {
-          // 판매자의 입찰은 해제하지 않고, lockedAmount에서 차감만 함
-          // 판매자가 자신의 경매에 입찰한 금액은 이미 자신의 돈이므로
-          // 즉시구매 시 그 금액은 판매자에게 돌아가지 않음
-          await this.accountsService.deductWinningBidAmount(
-            sellerId,
-            bid.amount.toNumber(),
-          );
-        } else {
-          // 일반 입찰자들의 잠금 해제 (즉시구매자 포함)
-          await this.accountsService.decrementLockedAmount(
-            bid.bidderId,
-            bid.amount.toNumber(),
-          );
-        }
-      }
-    }
 
-    // 즉시구매 가격만큼 currentAmount 차감
-    await this.accountsService.updateAccount(buyerId, {
-      currentAmount: {
-        decrement: new Prisma.Decimal(buyoutAmount),
-      },
-    });
+    const firstBid = previousBids[0];
+
+    const lastAmount = firstBid?.amount.toNumber();
+    const lastBidderId = firstBid?.bidderId;
+    const buyoutAmount = auction.buyoutPrice?.toNumber() ?? 0;
+
+    // 마지막 입찰자 잠금 금액 해제
+    await this.accountsService.decrementLockedAmount(+lastBidderId, lastAmount);
+    // 즉시구매자 현재 잔액 차감
+    await this.accountsService.deductCurrentAmount(+user.id, buyoutAmount);
 
     // 판매자에게 즉시구매 가격 입금
+    const sellerId = auction.sellerId;
     await this.accountsService.depositToSeller(sellerId, buyoutAmount);
+
+    // 즉시구매 생성
+    const buyerId = user.id;
+    const createdBid = await this.bidsService.createBuyout(+auctionId, buyerId);
 
     // WebSocket으로 실시간 업데이트 브로드캐스트
     await this.auctionsGateway.handleBidCreated(+auctionId);
@@ -175,7 +155,8 @@ export class BidsController {
       createdBid.id,
     );
 
-    return createdBid;
+    // return createdBid;
+    return { message: '즉시구매 완료' };
   }
 
   // 입찰 생성
